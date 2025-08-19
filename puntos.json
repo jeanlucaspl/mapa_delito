@@ -3,24 +3,28 @@
     "lat": -34.6037,
     "lng": -58.3816,
     "titulo": "Obelisco",
-    "descripcion": "Monumento icónico de Buenos Aires."
+    "descripcion": "Monumento icónico de Buenos Aires.",
+    "color": "#AB2E46"
   },
   {
     "lat": -34.609,
     "lng": -58.38,
     "titulo": "Plaza de Mayo",
-    "descripcion": "Centro histórico y político del país."
+    "descripcion": "Centro histórico y político del país.",
+    "color": "#AB2E46"
   },
   {
     "lat": -34.6118,
     "lng": -58.4173,
     "titulo": "Congreso de la Nación",
-    "descripcion": "Sede del poder legislativo argentino."
+    "descripcion": "Sede del poder legislativo argentino.",
+    "color": "#AB2E46"
   },
   {
     "lat": -34.62979513871941,
     "lng": -58.53137857544648,
     "titulo": "Robo de moto",
-    "descripcion": "Me esperaron en la esquina entre La Paz y Artigas."
+    "descripcion": "Me esperaron en la esquina entre La Paz y Artigas.",
+    "color": "#AB2E46"
   }
 ]
