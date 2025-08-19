@@ -2,12 +2,13 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Mapa con puntos cercanos</title>
+  <title>Mapa dinámico y responsive</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
   <style>
     body { margin: 0; font-family: sans-serif; }
     #map { height: 100vh; width: 100%; }
+
     #sidebar {
       position: absolute;
       top: 0;
@@ -19,8 +20,22 @@
       padding: 10px;
       box-sizing: border-box;
       overflow-y: auto;
+      word-wrap: break-word; /* texto largo se adapta */
       display: none;
       z-index: 1000;
+    }
+
+    /* 🔹 Ajuste de tamaño de controles para móviles */
+    @media (max-width: 768px) {
+      .leaflet-control-layers,
+      .leaflet-control-geosearch {
+        transform: scale(1.5);
+        transform-origin: top left;
+      }
+      .leaflet-control-zoom {
+        transform: scale(1.5);
+        transform-origin: top right;
+      }
     }
   </style>
 </head>
@@ -31,26 +46,34 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-geosearch/dist/geosearch.umd.js"></script>
   <script>
-    // Inicializamos el mapa
     var map = L.map('map').setView([-34.6037, -58.3816], 13);
+    var sidebar = document.getElementById("sidebar");
+    var panelAbierto = false;
+    var marcadores = [];
 
+    // 🔹 Capas del mapa
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    var sidebar = document.getElementById("sidebar");
-    var panelAbierto = false;
-    var marcadores = []; // todos los marcadores
-
-    // 🚀 Cargamos los puntos desde JSON
+    // 🔹 Cargar puntos desde JSON
     fetch("puntos.json")
       .then(response => response.json())
       .then(puntos => {
         puntos.forEach(p => {
-          var marker = L.marker([p.lat, p.lng]);
-          marker.data = p; // guardamos info
-          marcadores.push(marker);
+          // Usamos circleMarker para controlar color
+          var marker = L.circleMarker([p.lat, p.lng], {
+            radius: 8,
+            fillColor: p.color || "#3388ff",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+          });
+
+          marker.data = p;
           marker.addTo(map);
+          marcadores.push(marker);
 
           marker.on("click", function(e) {
             e.originalEvent.stopPropagation();
@@ -61,7 +84,6 @@
         });
       });
 
-    // Click en mapa cierra panel
     map.on("click", function() {
       if (panelAbierto) {
         sidebar.style.display = "none";
@@ -69,40 +91,40 @@
       }
     });
 
-    // 🔎 Buscador con autocompletado
+    // 🔹 Buscador con autocompletado
     const provider = new window.GeoSearch.OpenStreetMapProvider();
 
     const searchControl = new window.GeoSearch.GeoSearchControl({
       provider: provider,
       style: 'bar',
-      showMarker: false,  // no queremos marcador automático
+      showMarker: false,
       showPopup: false,
       autoClose: true,
-      retainZoomLevel: false
+      retainZoomLevel: false,
+      position: 'topleft' // buscador a la izquierda
     });
-
     map.addControl(searchControl);
 
-    // Evento cuando seleccionan dirección
     map.on('geosearch/showlocation', function(result) {
       var centro = result.location;
-      var radio = 5000; // 5 km en metros
+      var radio = 5000; // 5 km
 
-      // Limpiar mapa de marcadores previos
+      // Limpiar todos los marcadores
       marcadores.forEach(m => map.removeLayer(m));
 
-      // Agregar solo marcadores dentro de 5 km
+      // Agregar solo los cercanos
       marcadores.forEach(m => {
         var distancia = map.distance([centro.y, centro.x], m.getLatLng());
-        if (distancia <= radio) {
-          m.addTo(map);
-        }
+        if (distancia <= radio) m.addTo(map);
       });
 
       map.setView([centro.y, centro.x], 14);
       sidebar.style.display = "none";
       panelAbierto = false;
     });
+
+    // 🔹 Zoom control a la derecha
+    L.control.zoom({ position: 'topright' }).addTo(map);
 
   </script>
 </body>
