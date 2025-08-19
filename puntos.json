@@ -2,29 +2,22 @@
   {
     "lat": -34.6037,
     "lng": -58.3816,
-    "titulo": "Obelisco",
-    "descripcion": "Monumento icónico de Buenos Aires.",
-    "color": "#FF0000"
+    "titulo": "Robo",
+    "descripcion": "Incidente ocurrido en esta dirección",
+    "iconUrl": "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/icono-rojo.png"
   },
   {
-    "lat": -34.609,
+    "lat": -34.61,
     "lng": -58.38,
-    "titulo": "Plaza de Mayo",
-    "descripcion": "Centro histórico y político del país.",
-    "color": "#FF0000"
+    "titulo": "Cliente problemático",
+    "descripcion": "Incidente leve con cliente",
+    "iconUrl": "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/icono-azul.png"
   },
   {
-    "lat": -34.6118,
-    "lng": -58.4173,
-    "titulo": "Congreso de la Nación",
-    "descripcion": "Sede del poder legislativo argentino.",
-    "color": "#FF0000"
-  },
-  {
-    "lat": -34.62979513871941,
-    "lng": -58.53137857544648,
-    "titulo": "Robo de moto",
-    "descripcion": "Me esperaron en la esquina entre La Paz y Artigas.",
-    "color": "#FF0000"
+    "lat": -34.605,
+    "lng": -58.37,
+    "titulo": "Otro tipo",
+    "descripcion": "Incidente de otro tipo",
+    "iconUrl": "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/icono-verde.png"
   }
 ]
