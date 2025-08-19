@@ -1,56 +1,106 @@
-<script>
-  var map = L.map('map').setView([-34.6037, -58.3816], 13);
-  var sidebar = document.getElementById("sidebar");
-  var panelAbierto = false;
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Mapa con iconos personalizados</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #map { height: 100vh; width: 100%; }
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+    #sidebar {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 300px;
+      height: 100vh;
+      background: white;
+      border-left: 2px solid #ccc;
+      padding: 10px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      word-wrap: break-word;
+      display: none;
+      z-index: 1000;
+    }
 
-  // Marcadores desde JSON
-  fetch("puntos.json")
-    .then(response => response.json())
-    .then(puntos => {
-      puntos.forEach(p => {
-        var icon = L.icon({
-          iconUrl: p.iconUrl,
-          iconSize: [30, 40],
-          iconAnchor: [15, 40],
-          popupAnchor: [0, -35]
-        });
+    @media (max-width: 768px) {
+      .leaflet-control-geosearch {
+        transform: scale(1.5);
+        transform-origin: top left;
+      }
+      .leaflet-control-zoom {
+        transform: scale(1.5);
+        transform-origin: top left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="sidebar"></div>
 
-        var marker = L.marker([p.lat, p.lng], { icon: icon }).addTo(map);
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-geosearch/dist/geosearch.umd.js"></script>
+  <script>
+    // Inicializar mapa
+    var map = L.map('map').setView([-34.6037, -58.3816], 13);
+    var sidebar = document.getElementById("sidebar");
+    var panelAbierto = false;
 
-        marker.on("click", function(e) {
-          e.originalEvent.stopPropagation();
-          sidebar.style.display = "block";
-          sidebar.innerHTML = `<h2>${p.titulo}</h2><p>${p.descripcion}</p>`;
-          panelAbierto = true;
+    // Capa de mapa
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Cargar marcadores desde JSON
+    fetch("puntos.json")
+      .then(response => response.json())
+      .then(puntos => {
+        puntos.forEach(p => {
+          var icon = L.icon({
+            iconUrl: p.iconUrl,
+            iconSize: [30, 40],
+            iconAnchor: [15, 40],
+            popupAnchor: [0, -35]
+          });
+
+          var marker = L.marker([p.lat, p.lng], { icon: icon }).addTo(map);
+
+          marker.on("click", function(e) {
+            e.originalEvent.stopPropagation();
+            sidebar.style.display = "block";
+            sidebar.innerHTML = `<h2>${p.titulo}</h2><p>${p.descripcion}</p>`;
+            panelAbierto = true;
+          });
         });
       });
+
+    // Clic fuera de marcador cierra panel
+    map.on("click", function() {
+      if (panelAbierto) {
+        sidebar.style.display = "none";
+        panelAbierto = false;
+      }
     });
 
-  map.on("click", function() {
-    if (panelAbierto) {
-      sidebar.style.display = "none";
-      panelAbierto = false;
-    }
-  });
-
-  // Buscador con marcador visible
-  const provider = new window.GeoSearch.OpenStreetMapProvider();
-  const searchControl = new window.GeoSearch.GeoSearchControl({
-    provider: provider,
-    style: 'bar',
-    showMarker: true,
-    showPopup: false,
-    autoClose: true,
-    retainZoomLevel: false,
-    position: 'topright', // a la derecha del zoom por defecto
-    marker: {
-      icon: new L.Icon.Default(),
-      draggable: false
-    }
-  });
-  map.addControl(searchControl);
-</script>
+    // Buscador con marcador visible
+    const provider = new window.GeoSearch.OpenStreetMapProvider();
+    const searchControl = new window.GeoSearch.GeoSearchControl({
+      provider: provider,
+      style: 'bar',
+      showMarker: true,
+      showPopup: false,
+      autoClose: true,
+      retainZoomLevel: false,
+      position: 'topright', // a la derecha del zoom por defecto
+      marker: {
+        icon: new L.Icon.Default(),
+        draggable: false
+      }
+    });
+    map.addControl(searchControl);
+  </script>
+</body>
+</html>
