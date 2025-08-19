@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Mapa con puntos + buscador</title>
+  <title>Mapa con puntos cercanos</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
   <style>
@@ -40,13 +40,18 @@
 
     var sidebar = document.getElementById("sidebar");
     var panelAbierto = false;
+    var marcadores = []; // todos los marcadores
 
-    // Marcadores dinámicos desde JSON
+    // 🚀 Cargamos los puntos desde JSON
     fetch("puntos.json")
       .then(response => response.json())
       .then(puntos => {
         puntos.forEach(p => {
-          var marker = L.marker([p.lat, p.lng]).addTo(map);
+          var marker = L.marker([p.lat, p.lng]);
+          marker.data = p; // guardamos info
+          marcadores.push(marker);
+          marker.addTo(map);
+
           marker.on("click", function(e) {
             e.originalEvent.stopPropagation();
             sidebar.style.display = "block"; 
@@ -64,19 +69,40 @@
       }
     });
 
-    // 🔎 Buscador con autocompletado usando OpenStreetMap
+    // 🔎 Buscador con autocompletado
     const provider = new window.GeoSearch.OpenStreetMapProvider();
 
     const searchControl = new window.GeoSearch.GeoSearchControl({
       provider: provider,
       style: 'bar',
-      showMarker: true,
+      showMarker: false,  // no queremos marcador automático
       showPopup: false,
       autoClose: true,
       retainZoomLevel: false
     });
 
     map.addControl(searchControl);
+
+    // Evento cuando seleccionan dirección
+    map.on('geosearch/showlocation', function(result) {
+      var centro = result.location;
+      var radio = 5000; // 5 km en metros
+
+      // Limpiar mapa de marcadores previos
+      marcadores.forEach(m => map.removeLayer(m));
+
+      // Agregar solo marcadores dentro de 5 km
+      marcadores.forEach(m => {
+        var distancia = map.distance([centro.y, centro.x], m.getLatLng());
+        if (distancia <= radio) {
+          m.addTo(map);
+        }
+      });
+
+      map.setView([centro.y, centro.x], 14);
+      sidebar.style.display = "none";
+      panelAbierto = false;
+    });
 
   </script>
 </body>
