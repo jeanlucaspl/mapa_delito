@@ -18,7 +18,8 @@
       padding: 10px;
       box-sizing: border-box;
       overflow-y: auto;
-      display: none; /* 👈 oculto por defecto */
+      display: none;  /* 👈 oculto por defecto */
+      z-index: 1000;  /* 👈 sobre el mapa */
     }
   </style>
 </head>
@@ -35,6 +36,7 @@
     }).addTo(map);
 
     var sidebar = document.getElementById("sidebar");
+    var panelAbierto = false; // 👈 control de estado
 
     // 🚀 Cargamos los puntos desde el JSON
     fetch("puntos.json")
@@ -43,22 +45,24 @@
         puntos.forEach(p => {
           var marker = L.marker([p.lat, p.lng]).addTo(map);
 
-          marker.on("click", function() {
-            sidebar.style.display = "block"; // mostrar panel
+          marker.on("click", function(e) {
+            e.originalEvent.stopPropagation(); // 👈 evita que se dispare el click del mapa
+            sidebar.style.display = "block"; 
             sidebar.innerHTML = `
               <h2>${p.titulo}</h2>
               <p>${p.descripcion}</p>
             `;
+            panelAbierto = true;
           });
         });
       })
       .catch(error => console.error("Error cargando JSON:", error));
 
-    // 👇 Si clickean en el mapa fuera de los marcadores → ocultar la barra
-    map.on("click", function(e) {
-      // Solo cerrar si NO fue un click en un marcador
-      if (!e.originalEvent.target.closest('.leaflet-marker-icon')) {
+    // 👇 Si clickean en el mapa (no marcador) → ocultar la barra
+    map.on("click", function() {
+      if (panelAbierto) {
         sidebar.style.display = "none";
+        panelAbierto = false;
       }
     });
   </script>
