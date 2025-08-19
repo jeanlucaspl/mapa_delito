@@ -1,0 +1,20 @@
+[
+  {
+    "lat": -34.6037,
+    "lng": -58.3816,
+    "titulo": "Obelisco",
+    "descripcion": "Monumento icónico de Buenos Aires."
+  },
+  {
+    "lat": -34.609,
+    "lng": -58.38,
+    "titulo": "Plaza de Mayo",
+    "descripcion": "Centro histórico y político del país."
+  },
+  {
+    "lat": -34.6118,
+    "lng": -58.4173,
+    "titulo": "Congreso de la Nación",
+    "descripcion": "Sede del poder legislativo argentino."
+  }
+]

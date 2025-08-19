@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Mapa dinámico con JSON</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #map { height: 100vh; width: 75%; float: left; }
+    #sidebar {
+      width: 25%;
+      height: 100vh;
+      float: right;
+      padding: 10px;
+      box-sizing: border-box;
+      border-left: 2px solid #ccc;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="sidebar">
+    <h2>Información</h2>
+    <p>Haz clic en un marcador para ver los detalles aquí.</p>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    var map = L.map('map').setView([-34.6037, -58.3816], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    var sidebar = document.getElementById("sidebar");
+
+    // 🚀 Cargamos los puntos desde el JSON
+    fetch("puntos.json")
+      .then(response => response.json())
+      .then(puntos => {
+        puntos.forEach(p => {
+          var marker = L.marker([p.lat, p.lng]).addTo(map).bindPopup(p.titulo);
+
+          marker.on("click", function() {
+            sidebar.innerHTML = `
+              <h2>${p.titulo}</h2>
+              <p>${p.descripcion}</p>
+            `;
+          });
+        });
+      })
+      .catch(error => console.error("Error cargando JSON:", error));
+  </script>
+</body>
+</html>
