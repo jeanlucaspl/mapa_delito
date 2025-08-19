@@ -41,10 +41,10 @@
       .then(response => response.json())
       .then(puntos => {
         puntos.forEach(p => {
-          var marker = L.marker([p.lat, p.lng]).addTo(map).bindPopup(p.titulo);
+          var marker = L.marker([p.lat, p.lng]).addTo(map);
 
           marker.on("click", function() {
-            sidebar.style.display = "block"; // 👈 mostrar
+            sidebar.style.display = "block"; // mostrar panel
             sidebar.innerHTML = `
               <h2>${p.titulo}</h2>
               <p>${p.descripcion}</p>
@@ -55,8 +55,11 @@
       .catch(error => console.error("Error cargando JSON:", error));
 
     // 👇 Si clickean en el mapa fuera de los marcadores → ocultar la barra
-    map.on("click", function() {
-      sidebar.style.display = "none";
+    map.on("click", function(e) {
+      // Solo cerrar si NO fue un click en un marcador
+      if (!e.originalEvent.target.closest('.leaflet-marker-icon')) {
+        sidebar.style.display = "none";
+      }
     });
   </script>
 </body>
