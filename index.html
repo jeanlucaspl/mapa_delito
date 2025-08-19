@@ -25,15 +25,9 @@
       z-index: 1000;
     }
 
-    @media (max-width: 768px) {
-      .leaflet-control-geosearch {
-        transform: scale(1.5);
-        transform-origin: top left;
-      }
-      .leaflet-control-zoom {
-        transform: scale(1.5);
-        transform-origin: top left;
-      }
+    /* Clase para redimensionar controles de mapa */
+    .leaflet-control-custom {
+      transform-origin: top left;
     }
   </style>
 </head>
@@ -44,12 +38,14 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-geosearch/dist/geosearch.umd.js"></script>
   <script>
+    // Tamaño de controles relativo a la pantalla (ejemplo: 8%)
+    const tamanioControl = 8; // porcentaje de la altura de la pantalla
+
     // Inicializar mapa
     var map = L.map('map').setView([-34.6037, -58.3816], 13);
     var sidebar = document.getElementById("sidebar");
     var panelAbierto = false;
 
-    // Capa de mapa
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
@@ -77,7 +73,6 @@
         });
       });
 
-    // Clic fuera de marcador cierra panel
     map.on("click", function() {
       if (panelAbierto) {
         sidebar.style.display = "none";
@@ -85,7 +80,7 @@
       }
     });
 
-    // Buscador con marcador visible
+    // 🔹 Buscador con marcador visible y tamaño proporcional
     const provider = new window.GeoSearch.OpenStreetMapProvider();
     const searchControl = new window.GeoSearch.GeoSearchControl({
       provider: provider,
@@ -94,13 +89,31 @@
       showPopup: false,
       autoClose: true,
       retainZoomLevel: false,
-      position: 'topright', // a la derecha del zoom por defecto
+      position: 'topright', // temporario, luego ajustaremos CSS para centrar
       marker: {
         icon: new L.Icon.Default(),
         draggable: false
       }
     });
     map.addControl(searchControl);
+
+    // Ajustar tamaño y posición del buscador según la pantalla
+    const controls = document.getElementsByClassName('leaflet-control-geosearch');
+    for(let c of controls){
+      const size = window.innerHeight * (tamanioControl / 100);
+      c.style.transform = `scale(${size / 40})`; // 40 es el tamaño por defecto del control
+      c.style.transformOrigin = 'top center';
+      c.style.left = `${window.innerWidth/2 - (size/2)}px`;
+    }
+
+    // Cuando se hace búsqueda, mostrar marcador y centrar mapa
+    map.on('geosearch/showlocation', function(result) {
+      var centro = result.location;
+      map.setView([centro.y, centro.x], 14);
+      sidebar.style.display = "none";
+      panelAbierto = false;
+    });
+
   </script>
 </body>
 </html>
