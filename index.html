@@ -23,7 +23,7 @@
       overflow-y: auto;
       word-wrap: break-word;
       display: none;
-      z-index: 2000; /* siempre delante */
+      z-index: 2000; /* siempre adelante */
     }
 
     .leaflet-control-geosearch {
@@ -33,8 +33,10 @@
 
     /* Botón de geolocalización */
     .leaflet-control-locate {
-      background-color: white;
-      padding: 5px;
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1500;
       cursor: pointer;
     }
   </style>
@@ -47,10 +49,10 @@
   <script src="https://unpkg.com/leaflet-geosearch/dist/geosearch.umd.js"></script>
   <script>
     // Variables configurables
-    const tamanioIcono = 8; // % de pantalla para iconos
-    const tamanioBuscador = 8; // % de pantalla para buscador
+    const tamanioIcono = 8; // % de pantalla para iconos de marcadores
+    const tamanioBuscador = 8; // % de pantalla para buscador y botón geolocalización
 
-    // Inicializar mapa sin control de zoom
+    // Inicializar mapa sin zoom
     var map = L.map('map', { zoomControl: false }).setView([-34.6037, -58.3816], 13);
     var sidebar = document.getElementById("sidebar");
     var panelAbierto = false;
@@ -98,7 +100,7 @@
       }
     });
 
-    // Buscador con marcador visible
+    // Buscador
     const provider = new window.GeoSearch.OpenStreetMapProvider();
     const searchControl = new window.GeoSearch.GeoSearchControl({
       provider: provider,
@@ -124,11 +126,9 @@
         c.style.left = `${(window.innerWidth - size)/2}px`; // centrado horizontal
       }
     }
-
     ajustarBuscador();
     window.addEventListener('resize', ajustarBuscador);
 
-    // Mostrar marcador y centrar mapa al buscar
     map.on('geosearch/showlocation', function(result) {
       const centro = result.location;
       map.setView([centro.y, centro.x], 14);
@@ -136,20 +136,38 @@
       panelAbierto = false;
     });
 
-    // Botón de geolocalización
-    const locateControl = L.control({position: 'topleft'});
+    // 🔹 Botón geolocalización con icono personalizado
+    const locateControl = L.control({position: 'bottomright'});
     locateControl.onAdd = function(map) {
       const div = L.DomUtil.create('div', 'leaflet-control-locate');
-      div.innerHTML = '📍';
+      const size = window.innerHeight * (tamanioBuscador/100);
+      div.style.width = size + 'px';
+      div.style.height = size + 'px';
+      div.style.backgroundImage = 'url(https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/9b68639e36a74c46dc83ce6c097969b428b70f64/geolocalizacion.png)';
+      div.style.backgroundSize = 'contain';
+      div.style.backgroundRepeat = 'no-repeat';
+      div.style.backgroundPosition = 'center';
       div.title = 'Ir a mi ubicación';
       div.onclick = function() {
         map.locate({setView: true, maxZoom: 16});
-      }
+      };
       return div;
-    }
+    };
     locateControl.addTo(map);
 
-    // Evento al encontrar ubicación
+    // Ajustar tamaño botón geolocalización al cambiar tamaño de pantalla
+    function ajustarLocate() {
+      const size = window.innerHeight * (tamanioBuscador/100);
+      const btns = document.getElementsByClassName('leaflet-control-locate');
+      for (let b of btns) {
+        b.style.width = size + 'px';
+        b.style.height = size + 'px';
+      }
+    }
+    ajustarLocate();
+    window.addEventListener('resize', ajustarLocate);
+
+    // Mostrar ubicación encontrada
     map.on('locationfound', function(e) {
       L.marker(e.latlng).addTo(map)
         .bindPopup("Usted está aquí").openPopup();
