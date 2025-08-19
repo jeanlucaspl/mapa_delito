@@ -27,8 +27,11 @@
   }
 
   .leaflet-control-geosearch {
-    transform-origin: top center;
-    z-index: 1001; /* debajo del panel */
+    position: absolute !important;
+    top: 10px;       /* desde arriba */
+    left: 50% !important; /* centrar horizontal */
+    transform: translateX(-50%) scale(1); /* centrar y escalar */
+    z-index: 1001;
   }
 
   /* Botón de geolocalización */
@@ -115,15 +118,13 @@
   });
   map.addControl(searchControl);
 
- function ajustarBuscador() {
-  const controls = document.getElementsByClassName('leaflet-control-geosearch');
-  const scale = window.innerHeight * (tamanioBuscador/100) / 40;
-  for (let c of controls) {
-    c.style.right = "auto";        // eliminar posicionamiento derecho
-    c.style.left = "50%";          // centrar horizontal
-    c.style.transform = `translateX(-50%) scale(${scale})`; // centrar y escalar
+  function ajustarBuscador() {
+    const controls = document.getElementsByClassName('leaflet-control-geosearch');
+    const scale = window.innerHeight * (tamanioBuscador/100) / 40;
+    for (let c of controls) {
+      c.style.transform = `translateX(-50%) scale(${scale})`;
+    }
   }
-}
   ajustarBuscador();
   window.addEventListener('resize', ajustarBuscador);
 
