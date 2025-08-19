@@ -1,182 +1,179 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Mapa con iconos personalizados</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
-  <style>
-    body { margin: 0; font-family: sans-serif; }
-    #map { height: 100vh; width: 100%; }
+<meta charset="utf-8" />
+<title>Mapa con iconos personalizados</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
+<style>
+  body { margin: 0; font-family: sans-serif; }
+  #map { height: 100vh; width: 100%; }
 
-    #sidebar {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 300px;
-      height: 100vh;
-      background: white;
-      border-left: 2px solid #ccc;
-      padding: 10px;
-      box-sizing: border-box;
-      overflow-y: auto;
-      word-wrap: break-word;
-      display: none;
-      z-index: 2000; /* siempre adelante */
-    }
+  #sidebar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100vh;
+    background: white;
+    border-left: 2px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    word-wrap: break-word;
+    display: none;
+    z-index: 2000; /* siempre adelante */
+  }
 
-    .leaflet-control-geosearch {
-      transform-origin: top center;
-      z-index: 1001; /* debajo del panel */
-    }
+  .leaflet-control-geosearch {
+    transform-origin: top center;
+    z-index: 1001; /* debajo del panel */
+  }
 
-    /* Botón de geolocalización */
-    .leaflet-control-locate {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1500;
-      cursor: pointer;
-    }
-  </style>
+  /* Botón de geolocalización */
+  .leaflet-control-locate {
+    position: absolute;
+    right: 20px;
+    z-index: 1500;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
-  <div id="map"></div>
-  <div id="sidebar"></div>
+<div id="map"></div>
+<div id="sidebar"></div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-geosearch/dist/geosearch.umd.js"></script>
-  <script>
-    // Variables configurables
-    const tamanioIcono = 8; // % de pantalla para iconos de marcadores
-    const tamanioBuscador = 8; // % de pantalla para buscador y botón geolocalización
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-geosearch/dist/geosearch.umd.js"></script>
+<script>
+  // 🔹 Variables configurables
+  const tamanioIcono = 8; // % pantalla para iconos
+  const tamanioBuscador = 8; // % pantalla para buscador
+  const tamanioGeolocalizador = 8; // % pantalla para geolocalizador
+  const margenGeolocalizador = 5; // % altura de pantalla adicional para móviles
 
-    // Inicializar mapa sin zoom
-    var map = L.map('map', { zoomControl: false }).setView([-34.6037, -58.3816], 13);
-    var sidebar = document.getElementById("sidebar");
-    var panelAbierto = false;
+  // Inicializar mapa sin zoom
+  var map = L.map('map', { zoomControl: false }).setView([-34.6037, -58.3816], 13);
+  var sidebar = document.getElementById("sidebar");
+  var panelAbierto = false;
 
-    // Capa base
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+  // Capa base
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
 
-    // Función para calcular tamaño icono
-    function calcularIcono(sizePercent) {
-      const size = Math.min(window.innerWidth, window.innerHeight) * (sizePercent/100);
-      return [size, size * 1.3];
-    }
+  // Función para calcular tamaño icono
+  function calcularIcono(sizePercent) {
+    const size = Math.min(window.innerWidth, window.innerHeight) * (sizePercent/100);
+    return [size, size * 1.3];
+  }
 
-    // Cargar marcadores desde JSON
-    fetch("puntos.json")
-      .then(response => response.json())
-      .then(puntos => {
-        puntos.forEach(p => {
-          const [iconWidth, iconHeight] = calcularIcono(tamanioIcono);
+  // Cargar marcadores desde JSON
+  fetch("puntos.json")
+    .then(response => response.json())
+    .then(puntos => {
+      puntos.forEach(p => {
+        const [iconWidth, iconHeight] = calcularIcono(tamanioIcono);
 
-          var icon = L.icon({
-            iconUrl: p.iconUrl,
-            iconSize: [iconWidth, iconHeight],
-            iconAnchor: [iconWidth/2, iconHeight],
-            popupAnchor: [0, -iconHeight]
-          });
+        var icon = L.icon({
+          iconUrl: p.iconUrl,
+          iconSize: [iconWidth, iconHeight],
+          iconAnchor: [iconWidth/2, iconHeight],
+          popupAnchor: [0, -iconHeight]
+        });
 
-          var marker = L.marker([p.lat, p.lng], { icon: icon }).addTo(map);
+        var marker = L.marker([p.lat, p.lng], { icon: icon }).addTo(map);
 
-          marker.on("click", function(e) {
-            e.originalEvent.stopPropagation();
-            sidebar.style.display = "block";
-            sidebar.innerHTML = `<h2>${p.titulo}</h2><p>${p.descripcion}</p>`;
-            panelAbierto = true;
-          });
+        marker.on("click", function(e) {
+          e.originalEvent.stopPropagation();
+          sidebar.style.display = "block";
+          sidebar.innerHTML = `<h2>${p.titulo}</h2><p>${p.descripcion}</p>`;
+          panelAbierto = true;
         });
       });
-
-    map.on("click", function() {
-      if (panelAbierto) {
-        sidebar.style.display = "none";
-        panelAbierto = false;
-      }
     });
 
-    // Buscador
-    const provider = new window.GeoSearch.OpenStreetMapProvider();
-    const searchControl = new window.GeoSearch.GeoSearchControl({
-      provider: provider,
-      style: 'bar',
-      showMarker: true,
-      showPopup: false,
-      autoClose: true,
-      retainZoomLevel: false,
-      position: 'topright',
-      marker: {
-        icon: new L.Icon.Default(),
-        draggable: false
-      }
-    });
-    map.addControl(searchControl);
-
-    // Ajustar tamaño y posición del buscador
-    function ajustarBuscador() {
-      const controls = document.getElementsByClassName('leaflet-control-geosearch');
-      const size = window.innerHeight * (tamanioBuscador/100);
-      for (let c of controls) {
-        c.style.transform = `scale(${size/40})`;
-        c.style.left = `${(window.innerWidth - size)/2}px`; // centrado horizontal
-      }
-    }
-    ajustarBuscador();
-    window.addEventListener('resize', ajustarBuscador);
-
-    map.on('geosearch/showlocation', function(result) {
-      const centro = result.location;
-      map.setView([centro.y, centro.x], 14);
+  map.on("click", function() {
+    if (panelAbierto) {
       sidebar.style.display = "none";
       panelAbierto = false;
-    });
-
-    // 🔹 Botón geolocalización con icono personalizado
-    const locateControl = L.control({position: 'bottomright'});
-    locateControl.onAdd = function(map) {
-      const div = L.DomUtil.create('div', 'leaflet-control-locate');
-      const size = window.innerHeight * (tamanioBuscador/100);
-      div.style.width = size + 'px';
-      div.style.height = size + 'px';
-      div.style.backgroundImage = 'url(https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/9b68639e36a74c46dc83ce6c097969b428b70f64/geolocalizacion.png)';
-      div.style.backgroundSize = 'contain';
-      div.style.backgroundRepeat = 'no-repeat';
-      div.style.backgroundPosition = 'center';
-      div.title = 'Ir a mi ubicación';
-      div.onclick = function() {
-        map.locate({setView: true, maxZoom: 16});
-      };
-      return div;
-    };
-    locateControl.addTo(map);
-
-    // Ajustar tamaño botón geolocalización al cambiar tamaño de pantalla
-    function ajustarLocate() {
-      const size = window.innerHeight * (tamanioBuscador/100);
-      const btns = document.getElementsByClassName('leaflet-control-locate');
-      for (let b of btns) {
-        b.style.width = size + 'px';
-        b.style.height = size + 'px';
-      }
     }
-    ajustarLocate();
-    window.addEventListener('resize', ajustarLocate);
+  });
 
-    // Mostrar ubicación encontrada
-    map.on('locationfound', function(e) {
-      L.marker(e.latlng).addTo(map)
-        .bindPopup("Usted está aquí").openPopup();
-    });
+  // 🔹 Buscador
+  const provider = new window.GeoSearch.OpenStreetMapProvider();
+  const searchControl = new window.GeoSearch.GeoSearchControl({
+    provider: provider,
+    style: 'bar',
+    showMarker: true,
+    showPopup: false,
+    autoClose: true,
+    retainZoomLevel: false,
+    position: 'topright',
+    marker: { icon: new L.Icon.Default(), draggable: false }
+  });
+  map.addControl(searchControl);
 
-    map.on('locationerror', function(e) {
-      alert("No se pudo obtener la ubicación: " + e.message);
-    });
+  function ajustarBuscador() {
+    const controls = document.getElementsByClassName('leaflet-control-geosearch');
+    const size = window.innerHeight * (tamanioBuscador/100);
+    for (let c of controls) {
+      c.style.transform = `scale(${size/40})`;
+      c.style.left = `${(window.innerWidth - size)/2}px`; // centrado horizontal
+    }
+  }
+  ajustarBuscador();
+  window.addEventListener('resize', ajustarBuscador);
 
-  </script>
+  map.on('geosearch/showlocation', function(result) {
+    const centro = result.location;
+    map.setView([centro.y, centro.x], 14);
+    sidebar.style.display = "none";
+    panelAbierto = false;
+  });
+
+  // 🔹 Botón geolocalización
+  const locateControl = L.control({position: 'bottomright'});
+  locateControl.onAdd = function(map) {
+    const div = L.DomUtil.create('div', 'leaflet-control-locate');
+    div.style.backgroundImage = 'url(https://raw.githubusercontent.com/tuUsuario/tuRepo/main/tuIcono.png)';
+    div.style.backgroundSize = 'contain';
+    div.style.backgroundRepeat = 'no-repeat';
+    div.style.backgroundPosition = 'center';
+    div.title = 'Ir a mi ubicación';
+    div.onclick = function() {
+      map.locate({setView: true, maxZoom: 16});
+    };
+    return div;
+  };
+  locateControl.addTo(map);
+
+  function ajustarLocate() {
+    const size = window.innerHeight * (tamanioGeolocalizador/100);
+    let bottomOffset = 20; // default
+    // detectar dispositivos móviles/tablets
+    if (/Mobi|Android|iPhone|iPad|iPod|Tablet/i.test(navigator.userAgent)) {
+      bottomOffset = window.innerHeight * (margenGeolocalizador/100);
+    }
+    const btns = document.getElementsByClassName('leaflet-control-locate');
+    for (let b of btns) {
+      b.style.width = size + 'px';
+      b.style.height = size + 'px';
+      b.style.bottom = bottomOffset + 'px';
+    }
+  }
+  ajustarLocate();
+  window.addEventListener('resize', ajustarLocate);
+
+  map.on('locationfound', function(e) {
+    L.marker(e.latlng).addTo(map)
+      .bindPopup("Usted está aquí").openPopup();
+  });
+  map.on('locationerror', function(e) {
+    alert("No se pudo obtener la ubicación: " + e.message);
+  });
+
+</script>
 </body>
 </html>
