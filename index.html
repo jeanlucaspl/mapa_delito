@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Mapa dinámico y responsive</title>
+  <title>Mapa con iconos personalizados</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
   <style>
@@ -20,14 +20,12 @@
       padding: 10px;
       box-sizing: border-box;
       overflow-y: auto;
-      word-wrap: break-word; /* texto largo se adapta */
+      word-wrap: break-word;
       display: none;
       z-index: 1000;
     }
 
-    /* 🔹 Ajuste de tamaño de controles para móviles */
     @media (max-width: 768px) {
-      .leaflet-control-layers,
       .leaflet-control-geosearch {
         transform: scale(1.5);
         transform-origin: top left;
@@ -49,41 +47,36 @@
     var map = L.map('map').setView([-34.6037, -58.3816], 13);
     var sidebar = document.getElementById("sidebar");
     var panelAbierto = false;
-    var marcadores = [];
 
-    // 🔹 Capas del mapa
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // 🔹 Cargar puntos desde JSON
+    // 🔹 Cargar marcadores desde JSON
     fetch("puntos.json")
       .then(response => response.json())
       .then(puntos => {
         puntos.forEach(p => {
-          // Usamos circleMarker para controlar color
-          var marker = L.circleMarker([p.lat, p.lng], {
-            radius: 8,
-            fillColor: p.color || "#3388ff",
-            color: "#000",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8
+          // Icono personalizado desde GitHub
+          var icon = L.icon({
+            iconUrl: p.iconUrl,
+            iconSize: [30, 40],
+            iconAnchor: [15, 40],
+            popupAnchor: [0, -35]
           });
 
-          marker.data = p;
-          marker.addTo(map);
-          marcadores.push(marker);
+          var marker = L.marker([p.lat, p.lng], { icon: icon }).addTo(map);
 
           marker.on("click", function(e) {
             e.originalEvent.stopPropagation();
-            sidebar.style.display = "block"; 
+            sidebar.style.display = "block";
             sidebar.innerHTML = `<h2>${p.titulo}</h2><p>${p.descripcion}</p>`;
             panelAbierto = true;
           });
         });
       });
 
+    // Clic fuera del marcador cierra el panel
     map.on("click", function() {
       if (panelAbierto) {
         sidebar.style.display = "none";
@@ -93,7 +86,6 @@
 
     // 🔹 Buscador con autocompletado
     const provider = new window.GeoSearch.OpenStreetMapProvider();
-
     const searchControl = new window.GeoSearch.GeoSearchControl({
       provider: provider,
       style: 'bar',
@@ -101,23 +93,12 @@
       showPopup: false,
       autoClose: true,
       retainZoomLevel: false,
-      position: 'topleft' // buscador a la izquierda
+      position: 'topleft'
     });
     map.addControl(searchControl);
 
     map.on('geosearch/showlocation', function(result) {
       var centro = result.location;
-      var radio = 5000; // 5 km
-
-      // Limpiar todos los marcadores
-      marcadores.forEach(m => map.removeLayer(m));
-
-      // Agregar solo los cercanos
-      marcadores.forEach(m => {
-        var distancia = map.distance([centro.y, centro.x], m.getLatLng());
-        if (distancia <= radio) m.addTo(map);
-      });
-
       map.setView([centro.y, centro.x], 14);
       sidebar.style.display = "none";
       panelAbierto = false;
