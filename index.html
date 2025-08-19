@@ -51,7 +51,7 @@
   const tamanioIcono = 7; // % pantalla para iconos
   const tamanioBuscador = 7; // % pantalla para buscador
   const tamanioGeolocalizador = 8; // % pantalla para geolocalizador
-  const margenGeolocalizador = 7; // % altura de pantalla adicional para móviles
+  const margenGeolocalizador = 9; // % altura de pantalla adicional para móviles
 
   // Inicializar mapa sin zoom
   var map = L.map('map', { zoomControl: false }).setView([-34.6037, -58.3816], 13);
@@ -115,14 +115,15 @@
   });
   map.addControl(searchControl);
 
-  function ajustarBuscador() {
-    const controls = document.getElementsByClassName('leaflet-control-geosearch');
-    const size = window.innerHeight * (tamanioBuscador/100);
-    for (let c of controls) {
-      c.style.transform = `scale(${size/40})`;
-      c.style.left = `${(window.innerWidth - size)/2}px`; // centrado horizontal
-    }
+ function ajustarBuscador() {
+  const controls = document.getElementsByClassName('leaflet-control-geosearch');
+  const scale = window.innerHeight * (tamanioBuscador/100) / 40;
+  for (let c of controls) {
+    c.style.right = "auto";        // eliminar posicionamiento derecho
+    c.style.left = "50%";          // centrar horizontal
+    c.style.transform = `translateX(-50%) scale(${scale})`; // centrar y escalar
   }
+}
   ajustarBuscador();
   window.addEventListener('resize', ajustarBuscador);
 
