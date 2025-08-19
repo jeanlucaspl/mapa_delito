@@ -39,7 +39,7 @@
   <script src="https://unpkg.com/leaflet-geosearch/dist/geosearch.umd.js"></script>
   <script>
     // Tamaño de controles relativo a la pantalla (ejemplo: 8%)
-    const tamanioControl = 8; // porcentaje de la altura de la pantalla
+    const tamanioControl = 10; // porcentaje de la altura de la pantalla
 
     // Inicializar mapa
     var map = L.map('map').setView([-34.6037, -58.3816], 13);
@@ -57,7 +57,7 @@
         puntos.forEach(p => {
           var icon = L.icon({
             iconUrl: p.iconUrl,
-            iconSize: [30, 40],
+            iconSize: [50, 60],
             iconAnchor: [15, 40],
             popupAnchor: [0, -35]
           });
