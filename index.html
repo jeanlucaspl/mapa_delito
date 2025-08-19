@@ -57,7 +57,6 @@
       .then(response => response.json())
       .then(puntos => {
         puntos.forEach(p => {
-          // Icono personalizado desde GitHub
           var icon = L.icon({
             iconUrl: p.iconUrl,
             iconSize: [30, 40],
@@ -76,7 +75,6 @@
         });
       });
 
-    // Clic fuera del marcador cierra el panel
     map.on("click", function() {
       if (panelAbierto) {
         sidebar.style.display = "none";
@@ -84,16 +82,20 @@
       }
     });
 
-    // 🔹 Buscador con autocompletado
+    // 🔹 Buscador con marcador visible
     const provider = new window.GeoSearch.OpenStreetMapProvider();
     const searchControl = new window.GeoSearch.GeoSearchControl({
       provider: provider,
       style: 'bar',
-      showMarker: false,
+      showMarker: true,       // ahora se ve el marcador
       showPopup: false,
       autoClose: true,
       retainZoomLevel: false,
-      position: 'topleft'
+      position: 'topleft',
+      marker: {
+        icon: new L.Icon.Default(), // marcador por defecto de Leaflet
+        draggable: false
+      }
     });
     map.addControl(searchControl);
 
@@ -104,7 +106,7 @@
       panelAbierto = false;
     });
 
-    // 🔹 Zoom control a la derecha
+    // 🔹 Zoom control solo a la derecha
     L.control.zoom({ position: 'topright' }).addTo(map);
 
   </script>
