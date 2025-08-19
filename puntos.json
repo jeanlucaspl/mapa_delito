@@ -1,27 +1,5 @@
 [
   {
-    "lat": -34.6037,
-    "lng": -58.3816,
-    "titulo": "Robo",
-    "descripcion": "Incidente ocurrido en esta dirección",
-    "iconUrl": "https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/f29f60f5bbd893776c984387bf1173ed68f37d52/estafador.png"
-  },
-  {
-    "lat": -34.61,
-    "lng": -58.38,
-    "titulo": "Cliente problemático",
-    "descripcion": "Incidente leve con cliente",
-    "iconUrl": "https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/f29f60f5bbd893776c984387bf1173ed68f37d52/estafador.png"
-  },
-  {
-    "lat": -34.605,
-    "lng": -58.37,
-    "titulo": "Otro tipo",
-    "descripcion": "Incidente de otro tipo",
-    "iconUrl": "https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/f29f60f5bbd893776c984387bf1173ed68f37d52/ladron.png"
-  },
-  
-  {
     "lat": -34.62974216994861,
     "lng": -58.53150732148398,
     "titulo": "Robo de moto",
