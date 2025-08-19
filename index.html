@@ -48,10 +48,10 @@
 <script src="https://unpkg.com/leaflet-geosearch/dist/geosearch.umd.js"></script>
 <script>
   // 🔹 Variables configurables
-  const tamanioIcono = 8; // % pantalla para iconos
-  const tamanioBuscador = 8; // % pantalla para buscador
+  const tamanioIcono = 7; // % pantalla para iconos
+  const tamanioBuscador = 7; // % pantalla para buscador
   const tamanioGeolocalizador = 8; // % pantalla para geolocalizador
-  const margenGeolocalizador = 5; // % altura de pantalla adicional para móviles
+  const margenGeolocalizador = 7; // % altura de pantalla adicional para móviles
 
   // Inicializar mapa sin zoom
   var map = L.map('map', { zoomControl: false }).setView([-34.6037, -58.3816], 13);
@@ -110,7 +110,7 @@
     showPopup: false,
     autoClose: true,
     retainZoomLevel: false,
-    position: 'topright',
+    position: 'topleft',
     marker: { icon: new L.Icon.Default(), draggable: false }
   });
   map.addControl(searchControl);
