@@ -2,8 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Mapa dinámico con JSON</title>
+  <title>Mapa dinámico con JSON + buscador</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <style>
     body { margin: 0; font-family: sans-serif; }
     #map { height: 100vh; width: 100%; }
@@ -18,8 +19,8 @@
       padding: 10px;
       box-sizing: border-box;
       overflow-y: auto;
-      display: none;  /* 👈 oculto por defecto */
-      z-index: 1000;  /* 👈 sobre el mapa */
+      display: none;
+      z-index: 1000;
     }
   </style>
 </head>
@@ -28,6 +29,7 @@
   <div id="sidebar"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
   <script>
     var map = L.map('map').setView([-34.6037, -58.3816], 13);
 
@@ -36,9 +38,11 @@
     }).addTo(map);
 
     var sidebar = document.getElementById("sidebar");
-    var panelAbierto = false; // 👈 control de estado
+    var panelAbierto = false;
 
     // 🚀 Cargamos los puntos desde el JSON
+    var marcadores = []; // guardamos todos los marcadores
+
     fetch("puntos.json")
       .then(response => response.json())
       .then(puntos => {
@@ -46,7 +50,7 @@
           var marker = L.marker([p.lat, p.lng]).addTo(map);
 
           marker.on("click", function(e) {
-            e.originalEvent.stopPropagation(); // 👈 evita que se dispare el click del mapa
+            e.originalEvent.stopPropagation();
             sidebar.style.display = "block"; 
             sidebar.innerHTML = `
               <h2>${p.titulo}</h2>
@@ -54,17 +58,38 @@
             `;
             panelAbierto = true;
           });
-        });
-      })
-      .catch(error => console.error("Error cargando JSON:", error));
 
-    // 👇 Si clickean en el mapa (no marcador) → ocultar la barra
+          marcadores.push(marker);
+        });
+      });
+
     map.on("click", function() {
       if (panelAbierto) {
         sidebar.style.display = "none";
         panelAbierto = false;
       }
     });
+
+    // 🔎 Agregamos buscador de direcciones
+    var geocoder = L.Control.geocoder({
+      defaultMarkGeocode: false
+    })
+    .on('markgeocode', function(e) {
+      var bbox = e.geocode.bbox;
+      var poly = L.polygon([
+        bbox.getSouthEast(),
+        bbox.getNorthEast(),
+        bbox.getNorthWest(),
+        bbox.getSouthWest()
+      ]);
+      map.fitBounds(poly.getBounds());
+
+      // 👇 Opcional: marcar el punto buscado
+      L.marker(e.geocode.center).addTo(map)
+        .bindPopup("Destino buscado:<br>" + e.geocode.name)
+        .openPopup();
+    })
+    .addTo(map);
   </script>
 </body>
 </html>
