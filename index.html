@@ -28,18 +28,20 @@
 
   .leaflet-control-geosearch {
     position: absolute !important;
-    top: 10px;       /* desde arriba */
-    left: 50% !important; /* centrar horizontal */
-    transform: translateX(-50%) scale(1); /* centrar y escalar */
+    top: 10px;
+    left: 50% !important; 
+    transform: translateX(-50%) scale(1);
     z-index: 1001;
   }
 
-  /* Botón de geolocalización */
-  .leaflet-control-locate {
+  /* Controles personalizados */
+  .leaflet-control-custom {
     position: absolute;
-    right: 20px;
     z-index: 1500;
     cursor: pointer;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
   }
 </style>
 </head>
@@ -53,8 +55,9 @@
   // 🔹 Variables configurables
   const tamanioIcono = 7; // % pantalla para iconos
   const tamanioBuscador = 7; // % pantalla para buscador
-  const tamanioGeolocalizador = 8; // % pantalla para geolocalizador
-  const margenGeolocalizador = 9; // % altura de pantalla adicional para móviles
+  const tamanioGeolocalizador = 8; // % pantalla geolocalizador
+  const tamanioWhatsapp = 8; // % pantalla whatsapp
+  const margenInferior = 9; // % altura para mover botones en móviles
 
   // Inicializar mapa sin zoom
   var map = L.map('map', { zoomControl: false }).setView([-34.6037, -58.3816], 13);
@@ -135,14 +138,11 @@
     panelAbierto = false;
   });
 
-  // 🔹 Botón geolocalización
+  // 🔹 Botón geolocalización (derecha)
   const locateControl = L.control({position: 'bottomright'});
   locateControl.onAdd = function(map) {
-    const div = L.DomUtil.create('div', 'leaflet-control-locate');
-    div.style.backgroundImage = 'url(https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/2e2a29bee84f2c3e345b45350f5475ed2f0b8cf0/geolocalizacion.png)';
-    div.style.backgroundSize = 'contain';
-    div.style.backgroundRepeat = 'no-repeat';
-    div.style.backgroundPosition = 'center';
+    const div = L.DomUtil.create('div', 'leaflet-control-custom');
+    div.style.backgroundImage = 'url(https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/main/geolocalizacion.png)';
     div.title = 'Ir a mi ubicación';
     div.onclick = function() {
       map.locate({setView: true, maxZoom: 16});
@@ -151,23 +151,44 @@
   };
   locateControl.addTo(map);
 
-  function ajustarLocate() {
-    const size = window.innerHeight * (tamanioGeolocalizador/100);
-    let bottomOffset = 20; // default
-    // detectar dispositivos móviles/tablets
+  // 🔹 Botón WhatsApp (izquierda)
+  const whatsappControl = L.control({position: 'bottomleft'});
+  whatsappControl.onAdd = function(map) {
+    const div = L.DomUtil.create('div', 'leaflet-control-custom');
+    div.style.backgroundImage = 'url(https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/main/whatsapp.png)';
+    div.title = 'Contactar por WhatsApp';
+    div.onclick = function() {
+      window.open('https://wa.me/5491123456789?text=Quiero%20reportar%20un%20hecho', '_blank');
+    };
+    return div;
+  };
+  whatsappControl.addTo(map);
+
+  // 🔹 Ajustar tamaños/márgenes
+  function ajustarControles() {
+    const sizeGeo = window.innerHeight * (tamanioGeolocalizador/100);
+    const sizeWsp = window.innerHeight * (tamanioWhatsapp/100);
+    let bottomOffset = 20;
     if (/Mobi|Android|iPhone|iPad|iPod|Tablet/i.test(navigator.userAgent)) {
-      bottomOffset = window.innerHeight * (margenGeolocalizador/100);
+      bottomOffset = window.innerHeight * (margenInferior/100);
     }
-    const btns = document.getElementsByClassName('leaflet-control-locate');
-    for (let b of btns) {
-      b.style.width = size + 'px';
-      b.style.height = size + 'px';
-      b.style.bottom = bottomOffset + 'px';
+    const geoBtn = document.querySelector('.leaflet-bottom.leaflet-right .leaflet-control-custom');
+    if (geoBtn) {
+      geoBtn.style.width = sizeGeo + 'px';
+      geoBtn.style.height = sizeGeo + 'px';
+      geoBtn.style.bottom = bottomOffset + 'px';
+    }
+    const wspBtn = document.querySelector('.leaflet-bottom.leaflet-left .leaflet-control-custom');
+    if (wspBtn) {
+      wspBtn.style.width = sizeWsp + 'px';
+      wspBtn.style.height = sizeWsp + 'px';
+      wspBtn.style.bottom = bottomOffset + 'px';
     }
   }
-  ajustarLocate();
-  window.addEventListener('resize', ajustarLocate);
+  ajustarControles();
+  window.addEventListener('resize', ajustarControles);
 
+  // 🔹 Eventos ubicación
   map.on('locationfound', function(e) {
     L.marker(e.latlng).addTo(map)
       .bindPopup("Usted está aquí").openPopup();
@@ -175,7 +196,6 @@
   map.on('locationerror', function(e) {
     alert("No se pudo obtener la ubicación: " + e.message);
   });
-
 </script>
 </body>
 </html>
