@@ -53,7 +53,7 @@
 <script src="https://unpkg.com/leaflet-geosearch/dist/geosearch.umd.js"></script>
 <script>
   // 🔹 Variables configurables
-  const tamanioIcono = 7; // % pantalla para iconos
+  const tamanioIcono = 7; // % pantalla para iconos de reportes y talleres
   const tamanioBuscador = 7; // % pantalla para buscador
   const tamanioGeolocalizador = 8; // % pantalla geolocalizador
   const tamanioWhatsapp = 8; // % pantalla whatsapp
@@ -75,7 +75,7 @@
     return [size, size * 1.3];
   }
 
-  // Cargar marcadores desde JSON
+  // 🔹 Cargar marcadores de reportes (puntos.json)
   fetch("puntos.json")
     .then(response => response.json())
     .then(puntos => {
@@ -95,6 +95,31 @@
           e.originalEvent.stopPropagation();
           sidebar.style.display = "block";
           sidebar.innerHTML = `<h2>${p.titulo}</h2><p>${p.descripcion}</p>`;
+          panelAbierto = true;
+        });
+      });
+    });
+
+  // 🔹 Cargar marcadores de talleres (spots.json)
+  fetch("spots.json")
+    .then(response => response.json())
+    .then(spots => {
+      spots.forEach(s => {
+        const [iconWidth, iconHeight] = calcularIcono(tamanioIcono);
+
+        var icon = L.icon({
+          iconUrl: s.iconUrl,
+          iconSize: [iconWidth, iconHeight],
+          iconAnchor: [iconWidth/2, iconHeight],
+          popupAnchor: [0, -iconHeight]
+        });
+
+        var marker = L.marker([s.lat, s.lng], { icon: icon }).addTo(map);
+
+        marker.on("click", function(e) {
+          e.originalEvent.stopPropagation();
+          sidebar.style.display = "block";
+          sidebar.innerHTML = `<h2>${s.titulo}</h2><p>${s.descripcion}</p>`;
           panelAbierto = true;
         });
       });
@@ -138,12 +163,13 @@
     panelAbierto = false;
   });
 
-  // 🔹 Botón geolocalización (derecha)
+  // 🔹 Botón geolocalización (derecha extrema)
   const locateControl = L.control({position: 'bottomright'});
   locateControl.onAdd = function(map) {
     const div = L.DomUtil.create('div', 'leaflet-control-custom');
     div.style.backgroundImage = 'url(https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/main/geolocalizacion.png)';
     div.title = 'Ir a mi ubicación';
+    div.style.right = "10px"; // pegado a la derecha
     div.onclick = function() {
       map.locate({setView: true, maxZoom: 16});
     };
@@ -151,14 +177,15 @@
   };
   locateControl.addTo(map);
 
-  // 🔹 Botón WhatsApp (izquierda)
+  // 🔹 Botón WhatsApp (izquierda extrema)
   const whatsappControl = L.control({position: 'bottomleft'});
   whatsappControl.onAdd = function(map) {
     const div = L.DomUtil.create('div', 'leaflet-control-custom');
     div.style.backgroundImage = 'url(https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/main/whatsapp.png)';
     div.title = 'Contactar por WhatsApp';
+    div.style.left = "10px"; // pegado a la izquierda
     div.onclick = function() {
-      window.open('https://wa.me/5491123456789?text=Quiero%20reportar%20un%20hecho', '_blank');
+      window.open('https://wa.me/5491138543743?text=Quiero%20reportar%20un%20hecho', '_blank');
     };
     return div;
   };
@@ -177,12 +204,14 @@
       geoBtn.style.width = sizeGeo + 'px';
       geoBtn.style.height = sizeGeo + 'px';
       geoBtn.style.bottom = bottomOffset + 'px';
+      geoBtn.style.right = "10px"; // asegura que quede a la derecha
     }
     const wspBtn = document.querySelector('.leaflet-bottom.leaflet-left .leaflet-control-custom');
     if (wspBtn) {
       wspBtn.style.width = sizeWsp + 'px';
       wspBtn.style.height = sizeWsp + 'px';
       wspBtn.style.bottom = bottomOffset + 'px';
+      wspBtn.style.left = "10px"; // asegura que quede a la izquierda
     }
   }
   ajustarControles();
