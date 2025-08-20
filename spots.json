@@ -6,4 +6,12 @@
     "descripcion": "Precios razonables,buen trato",
     "iconUrl": "https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/main/bicicleta.png"
   }
+  
+  {
+    "lat": -34.61871345715019,
+    "lng": -58.393370771006886,
+    "titulo": "Taller de Moto",
+    "descripcion": "Precios razonables,buen trato",
+    "iconUrl": "https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/main/moto.png"
+  }
 ]
