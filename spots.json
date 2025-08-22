@@ -13,5 +13,13 @@
     "titulo": "Taller de Moto",
     "descripcion": "Precios razonables,buen trato",
     "iconUrl": "https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/main/moto.png"
+  },
+  
+  {
+    "lat": -34.61325474269791,
+    "lng": -58.38260713155623,
+    "titulo": "Empanadas Franco",
+    "descripcion": "Empanadas a 1000 pesos. Pizzas a 1200 pesos y mas. Se encuentra en el rappiturbo de Belgrano. Lo podes encontrar a partir de las 7:30 pm. Se acaban rapido.",
+    "iconUrl": "https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/main/comida.png"
   }
 ]
