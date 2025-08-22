@@ -13,5 +13,13 @@
     "titulo": "Cliente problemático",
     "descripcion": "Humboldt 656. Es una casa llena de cirujas. Hay quien por molestar manda pedidos a una vieja que vive ahi, la cual se vuelve loca cuando ve un repartidor cerca de su casa. Me tomo desprevenido y arrojo mi celular al piso. Con la pantalla rota me malogro la noche",
     "iconUrl": "https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/f29f60f5bbd893776c984387bf1173ed68f37d52/estafador.png"
+  },
+  
+  {
+    "lat": -34.614946490999,
+    "lng": -58.391576913513994,
+    "titulo": "Robo de moto",
+    "descripcion": "Se reporto robo de moto a las 5 pm",
+    "iconUrl": "https://raw.githubusercontent.com/jeanlucaspl/mapa_delito/f29f60f5bbd893776c984387bf1173ed68f37d52/ladron.png"
   }
 ]
